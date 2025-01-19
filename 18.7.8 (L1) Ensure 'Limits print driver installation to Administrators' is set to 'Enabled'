@@ -1,0 +1,22 @@
+# Define the registry path and value for 'Limits print driver installation to Administrators'
+$RegistryPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Print\Providers\ClientSideRendering"
+$ValueName = "RestrictDriverInstallationToAdministrators"
+$DesiredValue = 1  # Enable the setting (1 = Enabled)
+
+# Check if the registry key exists
+if (-not (Test-Path $RegistryPath)) {
+    # Create the registry key if it does not exist
+    New-Item -Path $RegistryPath -Force | Out-Null
+}
+
+# Set the registry value to enable the policy
+Set-ItemProperty -Path $RegistryPath -Name $ValueName -Value $DesiredValue -Force
+
+# Verify the change
+$CurrentValue = (Get-ItemProperty -Path $RegistryPath -Name $ValueName).$ValueName
+
+if ($CurrentValue -eq $DesiredValue) {
+    Write-Host "The 'Limits print driver installation to Administrators' policy has been successfully enabled." -ForegroundColor Green
+} else {
+    Write-Host "Failed to enable the 'Limits print driver installation to Administrators' policy. Current value: $CurrentValue." -ForegroundColor Red
+}
