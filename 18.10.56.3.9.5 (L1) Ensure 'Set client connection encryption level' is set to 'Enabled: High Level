@@ -1,0 +1,22 @@
+# Define the registry path and value for the 'Set client connection encryption level' setting
+$RegistryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+$ValueName = "EnableEncryptionLevel"
+$DesiredValue = 2 # High Encryption Level corresponds to a value of 2
+
+# Check if the registry key exists
+if (-not (Test-Path $RegistryPath)) {
+    # Create the registry key if it does not exist
+    New-Item -Path $RegistryPath -Force | Out-Null
+}
+
+# Set the policy to 'Enabled: High Level'
+Set-ItemProperty -Path $RegistryPath -Name $ValueName -Value $DesiredValue -Force
+
+# Verify the change
+$CurrentValue = (Get-ItemProperty -Path $RegistryPath -Name $ValueName).$ValueName
+
+if ($CurrentValue -eq $DesiredValue) {
+    Write-Host "Client connection encryption level has been set to 'High Level' successfully." -ForegroundColor Green
+} else {
+    Write-Host "Failed to set the client connection encryption level. Current value: $CurrentValue." -ForegroundColor Red
+}
