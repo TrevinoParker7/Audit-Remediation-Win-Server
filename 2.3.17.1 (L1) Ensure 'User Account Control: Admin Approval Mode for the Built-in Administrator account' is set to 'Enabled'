@@ -1,0 +1,22 @@
+# Define the registry path and value for 'Admin Approval Mode for the Built-in Administrator account'
+$RegistryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+$ValueName = "FilterAdministratorToken"
+$DesiredValue = 1  # Enabling Admin Approval Mode for Built-in Administrator account
+
+# Check if the registry key exists
+if (-not (Test-Path $RegistryPath)) {
+    # Create the registry key if it does not exist
+    New-Item -Path $RegistryPath -Force | Out-Null
+}
+
+# Set the registry value to enable Admin Approval Mode for Built-in Administrator account
+Set-ItemProperty -Path $RegistryPath -Name $ValueName -Value $DesiredValue -Force
+
+# Verify the change
+$CurrentValue = (Get-ItemProperty -Path $RegistryPath -Name $ValueName).$ValueName
+
+if ($CurrentValue -eq $DesiredValue) {
+    Write-Host "Admin Approval Mode for Built-in Administrator account has been successfully enabled." -ForegroundColor Green
+} else {
+    Write-Host "Failed to enable Admin Approval Mode for Built-in Administrator account. Current value: $CurrentValue." -ForegroundColor Red
+}
