@@ -1,0 +1,28 @@
+# Define temporary INF file paths
+$TempInfFile = "$env:Temp\SecurityPolicy.inf"
+$LogFile = "$env:Temp\SecurityPolicy.log"
+
+# Create the INF file with the desired settings
+@"
+[Unicode]
+Unicode=yes
+[Version]
+signature="\$CHICAGO\$"
+Revision=1
+[System Access]
+[Event Audit]
+[Registry Values]
+[Privilege Rights]
+MACHINE\System\CurrentControlSet\Control\Lsa\PostAuthenticationActions=4,1
+"@ | Set-Content -Path $TempInfFile -Force
+
+# Apply the security policy using SecEdit
+try {
+    secedit /configure /db secedit.sdb /cfg $TempInfFile /log $LogFile
+    Write-Host "Policy has been successfully applied."
+} catch {
+    Write-Error "Failed to apply the policy. Check the log file at $LogFile for details."
+} finally {
+    # Clean up temporary files
+    Remove-Item $TempInfFile -ErrorAction SilentlyContinue
+}
